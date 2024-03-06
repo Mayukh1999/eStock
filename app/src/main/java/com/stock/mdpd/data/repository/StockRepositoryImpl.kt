@@ -24,7 +24,7 @@ class StockRepositoryImpl @Inject constructor(
     private val db: StockDatabase,
     private val companyListingsParser: CSVParser<CompanyListing>,
     private val intradayInfoParser: CSVParser<IntradayInfo>,
-): StockRepository {
+) : StockRepository {
 
     private val dao = db.dao
 
@@ -34,6 +34,8 @@ class StockRepositoryImpl @Inject constructor(
     ): Flow<Resource<List<CompanyListing>>> {
         return flow {
             emit(Resource.Loading(true))
+
+            /*
             val localListings = dao.searchCompanyListing(query)
             emit(Resource.Success(
                 data = localListings.map { it.toCompanyListing() }
@@ -41,14 +43,16 @@ class StockRepositoryImpl @Inject constructor(
 
             val isDbEmpty = localListings.isEmpty() && query.isBlank()
             val shouldJustLoadFromCache = !isDbEmpty && !fetchFromRemote
-            if(shouldJustLoadFromCache) {
+            if (shouldJustLoadFromCache) {
                 emit(Resource.Loading(false))
                 return@flow
             }
+            */
+
             val remoteListings = try {
                 val response = api.getListings()
                 companyListingsParser.parse(response.byteStream())
-            } catch(e: IOException) {
+            } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Couldn't load data"))
                 null
@@ -59,6 +63,17 @@ class StockRepositoryImpl @Inject constructor(
             }
 
             remoteListings?.let { listings ->
+                emit(
+                    Resource.Success(
+                        data = listings
+                    )
+                )
+                emit(Resource.Loading(false))
+                dao.insertCompanyListings(
+                    listings.map { it.toCompanyListingEntity() }
+                )
+
+                /*
                 //dao.clearCompanyListings()
                 dao.insertCompanyListings(
                     listings.map { it.toCompanyListingEntity() }
@@ -69,6 +84,8 @@ class StockRepositoryImpl @Inject constructor(
                         .map { it.toCompanyListing() }
                 ))
                 emit(Resource.Loading(false))
+
+                 */
             }
         }
     }
@@ -78,12 +95,12 @@ class StockRepositoryImpl @Inject constructor(
             val response = api.getIntradayInfo(symbol)
             val results = intradayInfoParser.parse(response.byteStream())
             Resource.Success(results)
-        } catch(e: IOException) {
+        } catch (e: IOException) {
             e.printStackTrace()
             Resource.Error(
                 message = "Couldn't load intraday info"
             )
-        } catch(e: HttpException) {
+        } catch (e: HttpException) {
             e.printStackTrace()
             Resource.Error(
                 message = "Couldn't load intraday info"
@@ -95,12 +112,12 @@ class StockRepositoryImpl @Inject constructor(
         return try {
             val result = api.getCompanyInfo(symbol)
             Resource.Success(result.toCompanyInfo())
-        } catch(e: IOException) {
+        } catch (e: IOException) {
             e.printStackTrace()
             Resource.Error(
                 message = "Couldn't load company info"
             )
-        } catch(e: HttpException) {
+        } catch (e: HttpException) {
             e.printStackTrace()
             Resource.Error(
                 message = "Couldn't load company info"
