@@ -11,6 +11,7 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -41,7 +42,8 @@ fun CompanyListingsScreen(
             },
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .testTag("searchStock"),
             placeholder = {
                 Text(text = "Search...")
             },
@@ -52,10 +54,14 @@ fun CompanyListingsScreen(
             state = swipeRefreshState,
             onRefresh = {
                 viewModel.onEvent(CompanyListingsEvent.Refresh)
-            }
+            },
+            modifier = Modifier.testTag("progress")
+
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag("stock_list")
             ) {
                 items(state.companies.size) { i ->
                     val company = state.companies[i]
@@ -70,10 +76,12 @@ fun CompanyListingsScreen(
                             }
                             .padding(16.dp)
                     )
-                    if(i < state.companies.size) {
-                        Divider(modifier = Modifier.padding(
-                            horizontal = 16.dp
-                        ))
+                    if (i < state.companies.size) {
+                        Divider(
+                            modifier = Modifier.padding(
+                                horizontal = 16.dp
+                            )
+                        )
                     }
                 }
             }

@@ -35,7 +35,7 @@ class StockRepositoryImpl @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
 
-            /*
+
             val localListings = dao.searchCompanyListing(query)
             emit(Resource.Success(
                 data = localListings.map { it.toCompanyListing() }
@@ -47,7 +47,7 @@ class StockRepositoryImpl @Inject constructor(
                 emit(Resource.Loading(false))
                 return@flow
             }
-            */
+
 
             val remoteListings = try {
                 val response = api.getListings()

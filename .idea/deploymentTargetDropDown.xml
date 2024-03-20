@@ -2,7 +2,22 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="StockDetailsFeature">
+        <State />
+      </entry>
+      <entry key="StockSearchFeature">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="testing()">
+        <State />
+      </entry>
+      <entry key="validateMovieDetailsChartVisible()">
+        <State />
+      </entry>
+      <entry key="validateMovieDetailsTitleVisible()">
         <State />
       </entry>
     </value>
